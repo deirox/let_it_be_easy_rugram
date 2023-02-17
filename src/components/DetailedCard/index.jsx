@@ -4,6 +4,9 @@ import "./style.css";
 import { FaHeart, FaRegHeart, FaComment } from "react-icons/fa";
 import Comment from "../Comment";
 import cn from "classnames";
+import Button from "../Button";
+import PhotoModal from "../PhotoModal";
+import TextArea from "../TextArea";
 
 const DetailedCard = ({
   nickname,
@@ -11,18 +14,30 @@ const DetailedCard = ({
   userId,
   imgUrl,
   likes,
-  isLikedByUsers,
+  isLikedByUser,
   comments,
   className,
+  onLikeClick,
+  id,
+  onCommentSendClick,
+  mutateLoading,
 }) => {
   const [isCommentsShow, setIsCommentsShow] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [comment, setComments] = useState("");
+
+  const handleSendCommentClick = () => {
+    if (comment) {
+      onCommentSendClick(id, comment);
+      setComments("");
+    }
+  };
   const renderComments = (comments) => {
     if (comments.length > 2 && !isCommentsShow) {
       const commentsForRender = [...comments].slice(
         comments.length - 2,
         comments.length
       );
-      // console.log(commentsForRender);
 
       return (
         <>
@@ -40,6 +55,15 @@ const DetailedCard = ({
       <Comment key={index} {...comment} />
     ));
   };
+  const onClose = () => {
+    setIsModalOpen(false);
+    setComments("");
+  };
+  const onOpenModal = () => {
+    setIsModalOpen(true);
+    setComments("");
+  };
+
   return (
     <div className={cn("cnDetailedCardRoot", className)}>
       <div className="cnDetailedCardHeader">
@@ -49,12 +73,39 @@ const DetailedCard = ({
         <img className="cnDetailedCardImage" src={imgUrl} alt="img" />
       </div>
       <div className="cnDetailedCardButtons">
-        {isLikedByUsers ? <FaHeart size={18} /> : <FaRegHeart size={18} />}
-        <FaComment size={18} />
+        {isLikedByUser ? (
+          <FaHeart onClick={() => onLikeClick(id)} size={18} />
+        ) : (
+          <FaRegHeart onClick={() => onLikeClick(id)} size={18} />
+        )}
+        <FaComment size={18} onClick={() => setIsModalOpen(true)} />
       </div>
       <div className="cnDetailedCardLikes">{`Оценили ${likes} человек XD`}</div>
       <div className="cnDetailedCardComments">{renderComments(comments)}</div>
-      <textarea className="cnDetailedCardTextarea" />
+      <TextArea
+        value={comment}
+        setValue={setComments}
+        placeholder="Введите комментарий"
+        isLoading={mutateLoading}
+        onSubmit={handleSendCommentClick}
+        buttonText="Отправить"
+      />
+      <PhotoModal
+        isOpen={isModalOpen}
+        onOpenModal={onOpenModal}
+        onClose={onClose}
+        userId={userId}
+        imgUrl={imgUrl}
+        avatarUrl={avatarUrl}
+        nickname={nickname}
+        comments={comments}
+        isLiked={isLikedByUser}
+        commentValue={comment}
+        setCommentValue={setComments}
+        onCommentSubmit={handleSendCommentClick}
+        isCommentLoading={mutateLoading}
+        onLikeClick={() => onLikeClick(id)}
+      />
     </div>
   );
 };

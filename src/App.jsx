@@ -1,6 +1,7 @@
 import React from "react";
 import { Provider } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import PageRoutes from "./components/PageRoutes";
 import MainPage from "./pages/MainPage";
 import UserPage from "./pages/UserPage";
 import { store } from "./redux/store";
@@ -8,12 +9,7 @@ import { store } from "./redux/store";
 const App = () => {
   return (
     <Provider store={store}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<MainPage />}></Route>
-          <Route path="/:userId" element={<UserPage />}></Route>
-        </Routes>
-      </BrowserRouter>
+      <PageRoutes />
     </Provider>
   );
 };

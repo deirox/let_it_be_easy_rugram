@@ -4,21 +4,15 @@ import { Bars } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import DetailedCard from "../../components/DetailedCard";
 import Layout from "../../components/Layout";
-import { getPhotos } from "../../redux/actions/photos";
+import { getPhotos, sendComment, toggleLike } from "../../redux/actions/photos";
 import "./style.css";
 
 const MainPage = () => {
-  let commentsDEMO = [
-    { userName: "чипушила", text: "ля нефор" },
-    { userName: "чипушила2", text: "фу нефор" },
-    { userName: "чипушила3", text: "бля нефор" },
-    { userName: "чипушила4", text: "ля нефор" },
-    { userName: "чипушила5", text: "фу нефор" },
-    { userName: "чипушила6", text: "бля нефор" },
-  ];
   const photos = useSelector((state) => state.photos.photos);
   const loading = useSelector((state) => state.isPhotosLoading);
+  const authorizedUser = useSelector((state) => state.users.authorizedUser);
   const total = useSelector((state) => state.photos.totalPhotos);
+  const mutateLoading = useSelector((state) => state.photos.isMutateLoading);
   const dispatch = useDispatch();
 
   const [page, setPage] = useState(1);
@@ -30,9 +24,19 @@ const MainPage = () => {
   const nextHandler = () => {
     setPage(page + 1);
   };
+  const onLikeClick = (photoId) => {
+    dispatch(toggleLike(authorizedUser.id, photoId));
+  };
+  const onCommentSendClick = (photoId, comment) => {
+    dispatch(sendComment(authorizedUser.nickname, photoId, comment));
+  };
 
   return (
-    <Layout userId="1" nickname="говноед">
+    <Layout
+      userId={authorizedUser.id}
+      nickname={authorizedUser.nickname}
+      avatarUrl={authorizedUser.avatarUrl}
+    >
       <div className="cnMainPageRoot">
         {loading ? (
           <div className="cnMainPageLoaderContainer">
@@ -50,19 +54,22 @@ const MainPage = () => {
             }
             endMessage={<p className="cnMainPageLoaderContainer">Thats all!</p>}
           >
-            {photos.map(({ author, imgUrl, comments, likes }, index) => {
-              // console.log(author);
-
+            {photos.map(({ id, author, imgUrl, comments, likes }, index) => {
               return (
                 <DetailedCard
                   key={index}
+                  id={id}
                   nickname={author.nickname}
                   avatarUrl={author.avatarUrl}
+                  userId={author.id}
                   imgUrl={imgUrl}
                   comments={comments}
                   likes={likes.length}
-                  isLikedByUsers={true}
+                  isLikedByUser={likes.includes(authorizedUser.id)}
                   className={"cnMainPageCard"}
+                  onLikeClick={onLikeClick}
+                  onCommentSendClick={onCommentSendClick}
+                  mutateLoading={mutateLoading}
                 />
               );
             })}

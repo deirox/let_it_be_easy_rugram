@@ -1,0 +1,13 @@
+.cnButton {
+  background: #2196f3;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cnButton[disabled],
+.cnButton:active {
+  background: #1976d2;
+}
